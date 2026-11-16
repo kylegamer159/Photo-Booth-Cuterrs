@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#f7d9e6" />
+<title>Snap &amp; Style — Cute Photo Booth</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Fredoka:wght@400;500;600&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ctext y='26' font-size='26'%3E%F0%9F%93%B8%3C/text%3E%3C/svg%3E" />
+<link rel="stylesheet" href="css/app.css" />
+</head>
+<body>
+<div class="bg-mesh" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+<div id="floaters" class="floaters" aria-hidden="true"></div>
+
+<!-- ══════════════ LOGIN ══════════════ -->
+<section id="screen-login" class="screen active">
+  <div class="login-wrap">
+    <div class="glass login-card">
+      <div class="login-art" aria-hidden="true">
+        <span class="pa p1"></span><span class="pa p2"></span><span class="pa p3"></span>
+      </div>
+      <h1 class="logo">Snap <em>&amp;</em> Style</h1>
+      <p class="tagline">Cute photo booth — strips, polaroids &amp; collages.</p>
+
+      <div class="tabs" role="tablist">
+        <button class="tab active" data-tab="signin" role="tab">Sign in</button>
+        <button class="tab" data-tab="signup" role="tab">Sign up</button>
+      </div>
+
+      <form id="auth-form" class="auth-form" novalidate>
+        <label class="field">
+          <span>Email</span>
+          <input id="auth-email" type="email" autocomplete="email" required placeholder="you@cute.com" />
+        </label>
+        <label class="field">
+          <span>Password</span>
+          <span class="pw">
+            <input id="auth-password" type="password" autocomplete="current-password" required minlength="6" placeholder="••••••••" />
+            <button type="button" id="pw-toggle" class="pw-toggle" aria-label="Show password">👁</button>
+          </span>
+        </label>
+        <p id="auth-msg" class="msg" role="status"></p>
+        <button type="submit" class="btn primary big" id="auth-submit">Let’s Snap!</button>
+      </form>
+
+      <button id="btn-google" class="btn ghost google"><span class="g">G</span> Continue with Google</button>
+      <button id="btn-guest" class="btn link">Continue as guest →</button>
+      <p class="privacy">🔒 Your photos stay on your device unless you save them to your gallery.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ HOME ══════════════ -->
+<section id="screen-home" class="screen">
+  <header class="topbar">
+    <div class="brand">Snap <em>&amp;</em> Style</div>
+    <div class="topbar-right">
+      <span id="home-user" class="pill">Guest</span>
+      <button id="btn-logout" class="icon-btn" title="Sign out">⎋</button>
+    </div>
+  </header>
+
+  <div class="home">
+    <h2 class="hello">Hi there <span id="home-name">cutie</span> 👋</h2>
+    <p class="sub">Pick a vibe and start snapping.</p>
+
+    <div class="mode-grid">
+      <button class="mode-card booth" id="go-booth">
+        <span class="mode-emoji">📸</span>
+        <span class="mode-title">Photo Booth</span>
+        <span class="mode-sub">Camera + countdown</span>
+      </button>
+      <button class="mode-card collage" id="go-collage">
+        <span class="mode-emoji">🖼</span>
+        <span class="mode-title">Collage</span>
+        <span class="mode-sub">Upload your photos</span>
+      </button>
+      <button class="mode-card studio" id="go-studio">
+        <span class="mode-emoji">✂️</span>
+        <span class="mode-title">My Frames</span>
+        <span class="mode-sub">Use your own artwork</span>
+      </button>
+      <button class="mode-card gallery" id="go-gallery">
+        <span class="mode-emoji">💖</span>
+        <span class="mode-title">Favorites</span>
+        <span class="mode-sub">Saved snaps</span>
+      </button>
+    </div>
+
+    <div class="strip-row">
+      <h3>Fresh frames</h3>
+      <div id="home-strip" class="mini-strip"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════ FRAME PICKER ══════════════ -->
+<section id="screen-frames" class="screen">
+  <header class="topbar">
+    <button class="icon-btn back" data-back="home">‹</button>
+    <div class="title">Choose a frame</div>
+    <div class="count" id="frame-count"></div>
+  </header>
+  <div class="frame-tabs" id="frame-tabs"></div>
+  <p id="cloud-note" class="cloud-note"></p>
+  <div id="frame-grid" class="frame-grid"></div>
+</section>
+
+<!-- ══════════════ BOOTH ══════════════ -->
+<section id="screen-booth" class="screen">
+  <header class="topbar">
+    <button class="icon-btn back" data-back="frames">‹</button>
+    <div class="title" id="booth-title">Photo Booth</div>
+    <div class="count" id="booth-count">0 / 0</div>
+  </header>
+
+  <div class="booth">
+    <div class="camera-shell" id="camera-shell">
+      <video id="video" playsinline muted autoplay></video>
+      <canvas id="flash" class="flash" width="4" height="4"></canvas>
+      <div id="countdown" class="countdown"></div>
+      <div id="cam-note" class="cam-note hidden">Camera blocked — you can still upload photos.</div>
+      <div class="viewfinder" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+    </div>
+
+    <div id="captured-strip" class="captured-strip"></div>
+
+    <div class="booth-controls">
+      <button id="btn-upload-booth" class="btn ghost">Upload photos</button>
+      <button id="btn-shutter" class="shutter" aria-label="Take photo"><span></span></button>
+      <button id="btn-booth-done" class="btn primary">Style it →</button>
+    </div>
+    <input id="file-booth" type="file" accept="image/*" multiple hidden />
+  </div>
+</section>
+
+<!-- ══════════════ EDITOR ══════════════ -->
+<section id="screen-editor" class="screen">
+  <header class="topbar">
+    <button class="icon-btn back" data-back="frames">‹</button>
+    <div class="title" id="editor-title">Style</div>
+    <button id="btn-export" class="btn primary sm">Export</button>
+  </header>
+
+  <div class="editor">
+    <div class="stage-wrap" id="stage-wrap">
+      <div class="stage" id="stage"></div>
+    </div>
+
+    <p class="hint" id="slot-hint">Tap a window, then drag to align your photo.</p>
+
+    <div class="tools">
+      <div class="tool-row">
+        <span class="tool-label">Zoom</span>
+        <input id="zoom" type="range" min="1" max="3" step="0.01" value="1" />
+        <button id="btn-reset-slot" class="chip">Reset</button>
+        <button id="btn-clear-slot" class="chip">Clear</button>
+      </div>
+      <div class="tool-row wrap">
+        <button id="btn-fill-all" class="chip">Fill all with this</button>
+        <button id="btn-add-photo" class="chip">+ Photo</button>
+        <button id="btn-save" class="chip accent">Save to gallery</button>
+      </div>
+      <div class="filter-row" id="filter-row"></div>
+    </div>
+
+    <div class="tray" id="tray"></div>
+  </div>
+  <input id="file-editor" type="file" accept="image/*" multiple hidden />
+</section>
+
+<!-- ══════════════ STUDIO (my frames) ══════════════ -->
+<section id="screen-studio" class="screen">
+  <header class="topbar">
+    <button class="icon-btn back" data-back="home">‹</button>
+    <div class="title">My Frames</div>
+    <button id="studio-save" class="btn primary sm">Save frame</button>
+  </header>
+
+  <div class="studio">
+    <p class="hint">Upload your frame artwork and press <b>Auto-detect</b> — the empty photo windows are found for you. Adjust or delete any box that needs it. White-on-white frames: tick “Art sits above photos”.</p>
+
+    <div class="studio-actions">
+      <button id="studio-file-btn" class="btn ghost">Upload artwork</button>
+      <button id="studio-detect" class="btn ghost">✨ Auto-detect</button>
+      <button id="studio-add" class="btn ghost">+ Add window</button>
+      <label class="toggle"><input type="checkbox" id="studio-above" /> Art sits above photos</label>
+    </div>
+
+    <div class="studio-actions">
+      <button id="studio-bulk-btn" class="btn ghost">Import many frames</button>
+      <span id="studio-status" class="hint inline"></span>
+    </div>
+    <input id="studio-bulk-file" type="file" accept="image/*" multiple hidden />
+
+    <div class="stage-wrap tall" id="studio-wrap">
+      <div class="stage studio-stage" id="studio-stage">
+        <img id="studio-art" alt="" class="layer bg" />
+        <div id="studio-windows" class="studio-windows"></div>
+      </div>
+    </div>
+
+    <div class="tool-row">
+      <input id="studio-name" class="text-input" placeholder="Frame name" maxlength="28" />
+      <select id="studio-theme" class="text-input">
+        <option>My Frames</option><option>Ocean</option><option>Purple</option>
+        <option>Pink</option><option>Film</option><option>Scrapbook</option><option>Dark</option>
+      </select>
+    </div>
+
+    <label class="trim">
+      <span>Border trim</span>
+      <input id="studio-trim" type="range" min="0" max="0.12" step="0.005" value="0" />
+    </label>
+
+    <div id="studio-list" class="studio-list"></div>
+    <div id="studio-mine" class="frame-grid small"></div>
+    <input id="studio-file" type="file" accept="image/*" hidden />
+  </div>
+</section>
+
+<!-- ══════════════ GALLERY ══════════════ -->
+<section id="screen-gallery" class="screen">
+  <header class="topbar">
+    <button class="icon-btn back" data-back="home">‹</button>
+    <div class="title">Favorites</div>
+    <div class="count" id="gallery-count"></div>
+  </header>
+  <p id="gallery-msg" class="cloud-note"></p>
+  <div id="gallery-grid" class="gallery-grid"></div>
+</section>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
